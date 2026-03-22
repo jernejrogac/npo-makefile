@@ -2,6 +2,8 @@ CFLAGS = -m32
 
 TARGET = stopnje_prevajanja
 
+all: build run
+
 build_i:
 	cpp main.c -o main.i
 	
@@ -13,3 +15,9 @@ build_o: build_s
 
 build: build_o
 	gcc $(CFLAGS) main.o -o $(TARGET)
+
+run:
+	./$(TARGET)
+
+clean:
+	rm -f main.i main.s main.o $(TARGET)
