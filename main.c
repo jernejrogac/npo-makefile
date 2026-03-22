@@ -9,5 +9,6 @@ int funkcija(int x) {
 int main() {
     int y = funkcija(2);
     printf("Rezultat: %d\n", y);
+    printf("g = %.2f m/s²\n", g);
     return 0;
 }
