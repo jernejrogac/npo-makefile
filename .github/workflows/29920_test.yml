@@ -20,7 +20,7 @@ jobs:
           if [ ! -f test_main.c ]; then 
             echo "test_main.c ne obstaja" > napaka.txt
           else
-            echo "" > napaka.txt
+            touch napaka.txt
           fi
 
       - name: Nalozi napaka.txt
