@@ -1,6 +1,5 @@
 FROM gcc:13
 WORKDIR /app
-COPY main.c .
-COPY Makefile .
+COPY . .
 RUN make build
 CMD ["./stopnje_prevajanja"]

@@ -3,7 +3,7 @@ TARGET = stopnje_prevajanja
 build:
 	gcc main.c -o $(TARGET)
 
-run:
+run: build
 	./$(TARGET)
 
 clean:
