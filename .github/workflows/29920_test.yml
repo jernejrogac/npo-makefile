@@ -1,5 +1,4 @@
 name: 29920 - Testiranje
-
 on:
   push:
     branches: main
@@ -8,25 +7,20 @@ on:
 jobs:
   preveri_teste:
     name: Preveri testno datoteko
-    strategy:
-      matrix:
-        c_standard: [c99, c11]
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-
-      - name: Preveri ce obstaja test_main.c
+      - name: Preveri ce obstaja test_main.py
         run: |
-          if [ ! -f test_main.c ]; then 
-            echo "test_main.c ne obstaja" > napaka.txt
+          if [ ! -f test_main.py ]; then
+            echo "test_main.py ne obstaja" > napaka.txt
           else
             touch napaka.txt
           fi
-
       - name: Nalozi napaka.txt
         uses: actions/upload-artifact@v4
         with:
-          name: napaka-${{ matrix.c_standard }}
+          name: napaka
           path: napaka.txt
 
   pozeni_teste:
@@ -34,35 +28,28 @@ jobs:
     needs: preveri_teste
     strategy:
       matrix:
-        c_standard: [c99, c11]
+        python_version: ["3.10", "3.11", "3.12"]
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-
-      - name: Namesti gcc
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y gcc make
-
+      - name: Namesti Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python_version }}
       - name: Prenesi napaka.txt
         uses: actions/download-artifact@v4
         with:
-          name: napaka-${{ matrix.c_standard }}
+          name: napaka
           path: ./artefakti
-
-      - name: Preveri vsebino napaka.txt
+      - name: Preveri napaka.txt
         run: |
           if [ ! -f ./artefakti/napaka.txt ]; then
             echo "napaka.txt manjka"
             exit 1
           fi
-
-          value=$(cat ./artefakti/napaka.txt)
-          echo "Vsebina napaka.txt iz joba 1: $value"
-
           if [ -s ./artefakti/napaka.txt ]; then
+            cat ./artefakti/napaka.txt
             exit 1
           fi
-
       - name: Pozeni teste
-        run: make test
+        run: python -m unittest test_main.py -v

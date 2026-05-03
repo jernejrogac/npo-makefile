@@ -1,6 +1,4 @@
-FROM gcc:13
+FROM python:3.12-slim
 WORKDIR /app
-COPY main.c .
-COPY Makefile .
-RUN make build
-CMD ["./stopnje_prevajanja"]
+COPY main.py .
+CMD ["python", "main.py"]
