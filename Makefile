@@ -1,21 +1,10 @@
 TARGET = stopnje_prevajanja
 
-all: build run
-
-build_i:
-	cpp main.c -o main.i
-	
-build_s: build_i
-	gcc -S main.i -o main.s
-
-build_o: build_s
-	as main.s -o main.o
-
-build: build_o
-	gcc main.o -o $(TARGET)
+build:
+	gcc main.c -o $(TARGET)
 
 run:
 	./$(TARGET)
 
 clean:
-	rm -f main.i main.s main.o $(TARGET)
+	rm -f $(TARGET)
