@@ -12,18 +12,14 @@ on:
       - completed
 
 jobs:
-
   preveri_artefakt:
     name: Preveri rezultat testov
     runs-on: self-hosted
-    if: >
-      github.event_name == 'push' ||
-      github.event.workflow_run.conclusion == 'success'
+    if: github.event.workflow_run.conclusion == 'success'
 
     outputs:
       build_date: ${{ steps.datum.outputs.date }}
     steps:
-
       - name: Checkout repozitorija
         uses: actions/checkout@v4
 
@@ -35,21 +31,23 @@ jobs:
           branch: main
           name: napaka-c99
           path: ./artefakti
-        continue-on-error: true
 
       - name: Preveri napaka.txt
         run: |
-          value=`cat ./artefakti/napaka.txt`
+          if [ ! -f ./artefakti/napaka.txt ]; then
+            exit 1
+          fi
+
+          value=$(cat ./artefakti/napaka.txt)
           echo "Vsebina napaka.txt: $value"
+
           if [ -s ./artefakti/napaka.txt ]; then
-            echo "Testi niso presli - deploy se ne izvede!"
             exit 1
           fi
 
       - name: Trenutni cas
         id: datum
         run: |
-          echo "date=$(date +'%Y-%m-%d--%H-%M-%S')" >> "$GITHUB_ENV"
           echo "date=$(date +'%Y-%m-%d--%H-%M-%S')" >> "$GITHUB_OUTPUT"
 
       - name: Potisni na docker hub z akcijo
@@ -59,14 +57,12 @@ jobs:
           password: ${{ env.DOCKER_PASSWORD }}
           registry: docker.io
           dockerfile: Dockerfile
-          tags: ${{ env.date }}
+          tags: ${{ steps.datum.outputs.date }}
           image: ${{ env.DOCKER_USERNAME }}/${{ env.REPONAME }}
-
 
   release:
     needs: preveri_artefakt
     runs-on: self-hosted
     steps:
-
       - name: Izpis datuma objave iz prvega joba
         run: echo ${{ needs.preveri_artefakt.outputs.build_date }}

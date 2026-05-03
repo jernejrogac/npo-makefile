@@ -1,12 +1,11 @@
 name: 29920 - Testiranje
- 
+
 on:
   push:
     branches: main
   workflow_dispatch:
- 
+
 jobs:
- 
   preveri_teste:
     name: Preveri testno datoteko
     strategy:
@@ -14,21 +13,22 @@ jobs:
         c_standard: [c99, c11]
     runs-on: self-hosted
     steps:
- 
       - uses: actions/checkout@v4
- 
+
       - name: Preveri ce obstaja test_main.c
         run: |
-          ls test_main.c > /dev/null 2> napaka.txt
-          echo "Vsebina napaka.txt:"
-          cat napaka.txt || true
- 
+          if [ ! -f test_main.c ]; then 
+            echo "test_main.c ne obstaja" > napaka.txt
+          else
+            echo "" > napaka.txt
+          fi
+
       - name: Nalozi napaka.txt
         uses: actions/upload-artifact@v4
         with:
           name: napaka-${{ matrix.c_standard }}
           path: napaka.txt
- 
+
   pozeni_teste:
     name: Pozeni teste
     needs: preveri_teste
@@ -37,31 +37,35 @@ jobs:
         c_standard: [c99, c11]
     runs-on: self-hosted
     steps:
- 
       - uses: actions/checkout@v4
- 
+
       - name: Namesti gcc
         run: |
           sudo apt-get update -y
           sudo apt-get install -y gcc
- 
+
       - name: Prenesi napaka.txt
         uses: actions/download-artifact@v4
         with:
           name: napaka-${{ matrix.c_standard }}
           path: ./artefakti
- 
+
       - name: Preveri vsebino napaka.txt
         run: |
-          value=`cat ./artefakti/napaka.txt`
-          echo "Vsebina napaka.txt iz joba 1: $value"
-          if [ -s ./artefakti/napaka.txt ]; then
-            echo "NAPAKA: test_main.c ne obstaja!"
+          if [ ! -f ./artefakti/napaka.txt ]; then
+            echo "napaka.txt manjka"
             exit 1
           fi
- 
+
+          value=$(cat ./artefakti/napaka.txt)
+          echo "Vsebina napaka.txt iz joba 1: $value"
+
+          if [ -s ./artefakti/napaka.txt ]; then
+            exit 1
+          fi
+
       - name: Prevedi teste
         run: gcc -std=${{ matrix.c_standard }} test_main.c -o test_program
- 
+
       - name: Pozeni teste
         run: ./test_program
