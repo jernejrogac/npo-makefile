@@ -1,10 +1,11 @@
-TARGET = stopnje_prevajanja
+CFLAGS = -Wall
 
 build:
-	gcc main.c -o $(TARGET)
+    gcc $(CFLAGS) -o stopnje_prevajanja main.c
 
-run: build
-	./$(TARGET)
+test:
+    gcc $(CFLAGS) -DSKIP_MAIN -o test_izvrsljiv main.c test_main.c
+    ./test_izvrsljiv
 
 clean:
-	rm -f $(TARGET)
+    rm -f stopnje_prevajanja test_izvrsljiv napaka.txt

@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
-
-int funkcija(int x);
+#include "main.c"
 
 int main() {
     printf("Zacenjam teste...\n");
