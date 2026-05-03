@@ -10,10 +10,10 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      - name: Preveri ce obstaja test_main.py
+      - name: Preveri ce obstaja test_main.sh
         run: |
-          if [ ! -f test_main.py ]; then
-            echo "test_main.py ne obstaja" > napaka.txt
+          if [ ! -f test_main.sh ]; then
+            echo "test_main.sh ne obstaja" > napaka.txt
           else
             touch napaka.txt
           fi
@@ -28,14 +28,15 @@ jobs:
     needs: preveri_teste
     strategy:
       matrix:
-        python_version: ["3.10", "3.11"]
+        gcc_version: ["11", "12"]
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      - name: Namesti Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python_version }}
+      - name: Namesti gcc
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y gcc-${{ matrix.gcc_version }}
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${{ matrix.gcc_version }} 100
       - name: Prenesi napaka.txt
         uses: actions/download-artifact@v4
         with:
@@ -52,4 +53,4 @@ jobs:
             exit 1
           fi
       - name: Pozeni teste
-        run: python -m unittest test_main.py -v
+        run: make test

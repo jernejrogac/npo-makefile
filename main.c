@@ -6,7 +6,7 @@ int funkcija(int x) {
     return x + x;
 }
 
-#ifndef SKIP_MAIN
+
 int main() {
     int y = funkcija(2);
     #ifdef TEST
@@ -20,6 +20,6 @@ int main() {
     printf("g = %.2f m/s²\n", g);
     return 0;  
 }
-#endif
+
 
 

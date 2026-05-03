@@ -4,8 +4,8 @@ build:
 	gcc $(CFLAGS) -o stopnje_prevajanja main.c
 
 test:
-	gcc $(CFLAGS) -o test_izvrsljiv test_main.c
-	./test_izvrsljiv
-	
+	chmod +x test_main.sh
+	./test_main.sh
+
 clean:
-	rm -f stopnje_prevajanja test_izvrsljiv napaka.txt
+	rm -f stopnje_prevajanja program program_test
